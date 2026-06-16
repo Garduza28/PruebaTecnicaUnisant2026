@@ -21,6 +21,7 @@ Demostrar tus habilidades como desarrollador(a) backend/frontend en Laravel iden
 ## 📋 Pasos iniciales
 
 1. **Instalar y levantar** el proyecto siguiendo `README.md`.
+   > Si `php artisan serve` falla en Windows, usa: `php -S 127.0.0.1:8000 -t public`, Laravel Herd, XAMPP, etc.
 2. **Explorar** las rutas: Dashboard, Alumnos, Programas, Pagos.
 3. **Revisar** el código de los controladores, modelos, migraciones y vistas.
 4. **Identificar** qué está mal (funcionalmente, de seguridad, de performance, de arquitectura).

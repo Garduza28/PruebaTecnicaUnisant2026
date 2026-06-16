@@ -27,6 +27,11 @@ php artisan migrate --seed
 
 # 5. Iniciar servidor
 php artisan serve
+
+> **¿`php artisan serve` no funciona?** En Windows con PHP 8.4+ puede fallar. Usa alguna de estas alternativas:
+> - **Herd:** Si tienes Laravel Herd instalado, el proyecto debería aparecer automáticamente en `http://prueba-tecnica-unisant.test`.
+> - **Servidor PHP nativo:** `php -S 127.0.0.1:8000 -t public`
+> - **Otra herramienta:** XAMPP, WAMP, Docker, etc.
 ```
 
 **Credenciales de prueba:**
