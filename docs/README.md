@@ -69,15 +69,16 @@ routes/
 
 ## ⚠️ Estado del proyecto
 
-**Este proyecto NO está completo.** Contiene errores, bugs y malas prácticas deliberadamente introducidos para que el candidato los identifique y solucione.
+**Este proyecto NO está completo.** Fue construido sobre una base real que ha sufrido refactorizaciones, cambios de equipo y prisas de entrega. Como suele pasar en sistemas legacy, el código funciona... hasta que no.
 
-Los errores abarcan:
-- **Base de datos:** campos `text` en lugar de tipos adecuados, sin índices, sin `casts` en modelos.
-- **Backend:** N+1 queries, SQL injection potencial, sin paginación, sin transacciones, cálculos incorrectos, validaciones incompletas.
-- **Frontend:** selects sin paginación, DataTables sin optimización.
-- **Seguridad:** middleware de roles con `==` en lugar de `===`, rutas sin autenticación, endpoints API abiertos, CSRF mal colocado.
-- **Jobs:** fallos silenciosos, sin `chunk`, sin manejo de excepciones.
-- **Performance:** queries pesadas sin caché, sumas en PHP en lugar de SQL, carga de todos los registros en memoria.
+Te sugerimos explorar con ojo crítico estas áreas:
+
+- **Base de datos:** Revisa los tipos de dato elegidos en las migraciones y cómo se comportan los modelos al serializar ciertos campos.
+- **Backend:** Algunos listados pueden volverse lentos con más registros. Hay operaciones que quizá deberían ser atómicas.
+- **Seguridad:** No todo endpoint responde como esperarías cuando no hay sesión activa. Algunas comparaciones podrían ser más estrictas.
+- **Frontend:** Interactúa con los formularios y tablas como si fueras usuario final. Nota si algo se siente frágil.
+- **Procesos en segundo plano:** El sistema genera reportes automáticos. Pregúntate qué pasa si algo falla en mitad del proceso.
+- **Consistencia de datos:** Los seeders insertan información realista, pero no toda es "limpia". ¿Qué tan robusto es el sistema ante datos imperfectos?
 
 ---
 

@@ -45,43 +45,25 @@ Tu respuesta debe responder al menos estas preguntas para cada corrección impor
 
 ## 💡 Áreas de enfoque (no tienes que corregir todo)
 
-Prioriza las que más se ajusten al perfil buscado. Aquí hay algunas áreas con ejemplos de problemas:
+Prioriza las que más se ajusten al perfil buscado. Aquí hay algunas áreas con pistas:
 
 ### A. Base de datos y modelos
-- ¿Por qué hay campos `text` para montos, matrículas y fechas?
-- ¿Faltan índices en las tablas?
-- ¿Por qué `tags` no está casteado a `array`?
-- **NO evaluar:** foreign keys (las relaciones son simbólicas), `SoftDeletes` (no se usa en este sistema).
+Revisa cómo se definieron las columnas en las migraciones. Algunas decisiones de tipado podrían dificultar las consultas o el ordenamiento. Los modelos también pueden estar omitiendo algo que Laravel ofrece por defecto.
 
 ### B. Seguridad
-- ¿Hay posibilidad de SQL injection en algún controlador?
-- ¿El middleware de roles usa comparación estricta?
-- ¿Las rutas de eliminación usan el verbo HTTP correcto?
-- ¿Los endpoints API están protegidos?
+Navega por la aplicación sin iniciar sesión y observa qué rutas responden. Luego, inicia sesión con diferentes roles y prueba si realmente se respetan los permisos. Algunos formularios podrían aceptar más de lo que deberían.
 
 ### C. Performance
-- ¿El listado de alumnos pagina o carga todo?
-- ¿Hay N+1 queries en las vistas?
-- ¿El dashboard hace cálculos en PHP que podrían hacerse en SQL?
-- ¿Los selects de alumnos/sedes cargan miles de registros?
+Abre las herramientas de desarrollador del navegador y observa los tiempos de respuesta. Luego revisa el query log de Laravel. Algunas páginas pueden estar haciendo más trabajo del necesario, especialmente cuando hay relaciones involucradas.
 
 ### D. Lógica de negocio y validaciones
-- ¿Se puede registrar un pago negativo?
-- ¿Se valida que un alumno exista antes de registrar su pago?
-- ¿La creación de alumno + inscripción + pago es atómica?
-- ¿Se pueden eliminar alumnos con pagos pendientes?
+Intenta registrar datos extremos o inconsistentes (montos inusuales, fechas futuras, duplicados). Observa si el sistema los acepta sin reclamar. También pregunta qué pasaría si una operación que involucra tres tablas se interrumpe a la mitad.
 
 ### E. Frontend y UX
-- ¿El select de alumnos en pagos es usable con 1000+ registros?
-- ¿Falta algún botón de confirmación antes de eliminar?
-- **NO evaluar:** `old()` en formularios (no es parte del flujo de este sistema).
+Usa la aplicación como lo haría un usuario de control escolar que registra 50 alumnos al día. Algunos flujos pueden sentirse lentos o propensos a errores por descuido. Los formularios deberían guiar al usuario, no exponerlo a accidentes.
 
 ### F. Arquitectura y buenas prácticas
-- ¿Los jobs manejan excepciones?
-- ¿El exporte de CSV usa `chunk` para no saturar memoria?
-- ¿Hay transacciones en operaciones multi-tabla?
-- ¿Se usa caché en queries repetidas del dashboard?
-- **NO evaluar:** `FormRequest` (no se usa en este sistema; validar inline o en helpers).
+Revisa los procesos que corren en segundo plano y los reportes que se generan. Pregúntate qué pasa si la memoria se llena o si un registro tiene un formato inesperado. También observa si el dashboard repite trabajo que ya se hizo hace unos segundos.
 
 ---
 
