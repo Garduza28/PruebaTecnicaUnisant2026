@@ -15,23 +15,59 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
 
-        <a class="navbar-brand" href="/dashboard">SII Prueba</a>
+        <a class="navbar-brand" href="/dashboard">
+            SII Prueba
+        </a>
 
-        <div class="collapse navbar-collapse">
+        <button class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarPrincipal"
+                aria-controls="navbarPrincipal"
+                aria-expanded="false"
+                aria-label="Toggle navigation">
+
+            <span class="navbar-toggler-icon"></span>
+
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarPrincipal">
 
             <ul class="navbar-nav me-auto">
-                <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
-                <li class="nav-item"><a class="nav-link" href="/alumnos">Alumnos</a></li>
-                <li class="nav-item"><a class="nav-link" href="/programas">Programas</a></li>
-                <li class="nav-item"><a class="nav-link" href="/pagos/index">Pagos</a></li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/dashboard">
+                        Dashboard
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/alumnos">
+                        Alumnos
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/programas">
+                        Programas
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/pagos/index">
+                        Pagos
+                    </a>
+                </li>
+
             </ul>
 
-     
             <form method="POST" action="/logout" class="d-flex">
                 @csrf
+
                 <button class="btn btn-outline-light btn-sm" type="submit">
                     Cerrar sesión
                 </button>
+
             </form>
 
         </div>
