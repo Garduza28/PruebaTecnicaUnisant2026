@@ -15,11 +15,8 @@
     <div class="row">
 
         <div class="col-md-5">
-            <input type="text"
-                   name="buscar"
-                   class="form-control"
-                   placeholder="Buscar programa..."
-                   value="{{ request('buscar') }}">
+            <input type="text" name="buscar" class="form-control" placeholder="Buscar programa..."
+                value="{{ request('buscar') }}">
         </div>
 
         <div class="col-md-2 d-flex gap-2">
@@ -48,9 +45,9 @@
         @forelse($programas as $programa)
         <tr>
 
-<td>
-    {{ !empty($programa->nombre) ? $programa->nombre : 'No definido' }}
-</td>
+            <td>
+                {{ !empty($programa->nombre) ? $programa->nombre : 'No definido' }}
+            </td>
             <td>
                 ${{ number_format($programa->inscripcion, 2) }}
             </td>
@@ -71,11 +68,16 @@
                     Ver
                 </button>
 
-                @if(auth()->user()?->nivel_id <= 2)
-                <button class="btn btn-sm btn-primary">
+                @if(auth()->user()?->nivel_id <= 2) <button class="btn btn-sm btn-primary">
                     Editar
-                </button>
-                @endif
+                    </button>
+                    @endif
+
+                    @if(auth()->user()?->nivel_id == 1)
+                    <button class="btn btn-sm btn-danger" disabled>
+                        Eliminar
+                    </button>
+                    @endif
 
             </td>
 
@@ -97,19 +99,19 @@
     <nav>
         <ul class="pagination pagination-sm align-items-center gap-1 mb-0">
 
-          
+
             <li class="page-item {{ $programas->onFirstPage() ? 'disabled' : '' }}">
                 <a class="page-link" href="{{ $programas->previousPageUrl() }}">‹</a>
             </li>
 
-       
+
             @foreach ($programas->getUrlRange(1, $programas->lastPage()) as $page => $url)
-                <li class="page-item {{ $page == $programas->currentPage() ? 'active' : '' }}">
-                    <a class="page-link" href="{{ $url }}">{{ $page }}</a>
-                </li>
+            <li class="page-item {{ $page == $programas->currentPage() ? 'active' : '' }}">
+                <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+            </li>
             @endforeach
 
-            
+
             <li class="page-item {{ $programas->hasMorePages() ? '' : 'disabled' }}">
                 <a class="page-link" href="{{ $programas->nextPageUrl() }}">›</a>
             </li>

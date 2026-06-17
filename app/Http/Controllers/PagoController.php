@@ -80,7 +80,7 @@ public function index(Request $request)
     }
 
     $pagos = $query->orderBy('id', 'desc')
-                   ->paginate(10)
+                   ->paginate(3)
                    ->appends($request->all());
 
     return view('pagos.index', compact('pagos'));

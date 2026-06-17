@@ -25,7 +25,7 @@ class AlumnoController extends Controller
             ->when($request->filled('sede_id'), function ($query) use ($request) {
                 $query->where('sede_id', $request->sede_id);
             })
-            ->paginate(10)
+            ->paginate(3)
             ->withQueryString();
 
         $sedes = Sede::validas()->get();

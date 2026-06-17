@@ -19,7 +19,7 @@ public function index(Request $request)
 
     $programas = $query->withCount('materias')
         ->orderBy('id', 'desc')
-        ->paginate(10)
+        ->paginate(3)
         ->appends($request->all());
 
     return view('programas.index', compact('programas'));

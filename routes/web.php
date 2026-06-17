@@ -73,8 +73,9 @@ Route::middleware(['auth', 'throttle:30,1'])->group(function () {
         ->middleware('nivel:1,2');
 });
 
-Route::view('/login', 'auth.login')->name('login');
-
+Route::get('/login', function () {
+    return view('auth.login');
+})->middleware('guest')->name('login');
 
 Route::view('/register', 'auth.register')->name('register');
 
