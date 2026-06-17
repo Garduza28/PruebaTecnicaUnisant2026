@@ -8,18 +8,20 @@ use Symfony\Component\HttpFoundation\Response;
 
 class NivelMiddleware
 {
-    public function handle(Request $request, Closure $next, string $nivel): Response
-    {
-        $user = $request->user();
+public function handle(Request $request, Closure $next, ...$niveles): Response
+{
+    $user = $request->user();
 
-        if ($user->nivel_id == $nivel) {
-            return $next($request);
-        }
-
-        if ($user->nivel_id == null) {
-            return redirect('/login');
-        }
-
-        return redirect('/dashboard');
+    if (!$user) {
+        return redirect('/login');
     }
+
+    if (in_array($user->nivel_id, $niveles)) {
+        return $next($request);
+    }
+
+    //return redirect('/dashboard');
+    abort(403, 'No tienes permisos para acceder a esta sección');
+}
+
 }

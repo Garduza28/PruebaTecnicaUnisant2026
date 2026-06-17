@@ -14,4 +14,20 @@ class Programa extends Model
         return $this->belongsToMany(Materia::class, 'programa_materia');
     }
 
+
+
+// falta relacion inversa
+
+    public function inscripciones()
+{
+    return $this->hasMany(Inscripcion::class, 'programa_id');
+}
+
+public function scopeValidos($query)
+{
+    return $query
+        ->whereNotNull('nombre')
+        ->where('nombre', '!=', '');
+}
+
 }

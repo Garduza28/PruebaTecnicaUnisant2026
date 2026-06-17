@@ -4,47 +4,85 @@ namespace App\Http\Controllers;
 
 use App\Models\Pago;
 use App\Models\Alumno;
-use App\Models\Adeudo;
+use App\Models\Sede;
 use Illuminate\Http\Request;
+use App\Http\Services\RegistrarPagoService;
 
 class PagoController extends Controller
 {
+
     public function create()
-    {
-        $alumnos = Alumno::all();
-        return view('pagos.create', compact('alumnos'));
+    {   
+        // solo habian alumnos sin validaciones
+        //$alumnos = Alumno::all();
+
+       $alumnos = Alumno::validos()
+    ->whereIn('id', function ($query) {
+        $query->selectRaw('MIN(id)')
+            ->from('alumnos')
+            ->groupBy('matricula');
+    })
+    ->get();
+    
+        $sedes = Sede::validas()->orderBy('nombre')->get();
+
+        return view('pagos.create', compact('alumnos', 'sedes'));
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'matricula' => 'required',
-            'monto' => 'required',
-        ]);
+public function buscar(Request $request)
+{
+    $query = $request->get('q');
 
-        $alumno = Alumno::where('matricula', $request->input('matricula'))->first();
-        $monto = (float) $request->input('monto');
+    return Alumno::busqueda($query)
+        ->limit(10)
+        ->get();
+}
 
-        $pago = Pago::create([
-            'matricula' => $request->input('matricula'),
-            'concepto' => $request->input('concepto', 'Pago general'),
-            'monto' => $request->input('monto'),
-            'fecha_pago' => $request->input('fecha_pago', now()),
-            'metodo' => $request->input('metodo', 'efectivo'),
-            'sede_id' => $request->input('sede_id'),
-            'estado' => 'activo',
-        ]);
 
-        $comision = $request->input('monto') * 0.05;
-        $pago->nota = 'Comisión: ' . $comision;
-        $pago->save();
 
-        return redirect('/pagos/create')->with('success', 'Pago registrado');
+public function store(Request $request)
+{
+    $request->validate([
+        'matricula' => 'required|exists:alumnos,matricula',
+        'monto' => 'required|numeric|min:1|max:99999.99',
+        'fecha_pago' => 'required|date|before_or_equal:today',
+        'metodo' => 'required|string',
+        'sede_id' => 'required|exists:sedes,id',
+    ]);
+
+    RegistrarPagoService::execute($request->all());
+
+    return redirect('/pagos/create')
+        ->with('success', 'Pago registrado correctamente');
+}
+
+
+public function index(Request $request)
+{
+    $query = Pago::query();
+
+
+    if ($request->filled('buscar')) {
+        $query->where(function ($q) use ($request) {
+            $q->where('matricula', 'like', '%' . $request->buscar . '%')
+              ->orWhere('concepto', 'like', '%' . $request->buscar . '%');
+        });
     }
 
-    public function index()
-    {
-        $pagos = Pago::orderBy('id', 'desc')->get();
-        return view('pagos.index', compact('pagos'));
+    if ($request->filled('metodo')) {
+
+        if ($request->metodo === 'desconocido') {
+            $query->whereNull('metodo');
+        } else {
+            $query->where('metodo', $request->metodo);
+        }
+
     }
+
+    $pagos = $query->orderBy('id', 'desc')
+                   ->paginate(10)
+                   ->appends($request->all());
+
+    return view('pagos.index', compact('pagos'));
+}
 }

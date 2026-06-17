@@ -4,79 +4,109 @@ namespace App\Http\Controllers;
 
 use App\Models\Alumno;
 use App\Models\Sede;
-use App\Models\Inscripcion;
-use App\Models\Pago;
+use App\Models\Programa;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
+use App\Http\Services\RegistrarAlumnoService;
 
 class AlumnoController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Alumno::query();
-        $alumnos = $query->get();
+        $alumnos = Alumno::validos()
+            ->whereIn('id', function ($sub) {
+                $sub->selectRaw('MIN(id)')
+                    ->from('alumnos')
+                    ->groupBy('matricula');
+            })
+            ->when($request->filled('buscar'), function ($query) use ($request) {
+                $query->where('nombre_completo', 'like', "%{$request->buscar}%");
+            })
+            ->when($request->filled('sede_id'), function ($query) use ($request) {
+                $query->where('sede_id', $request->sede_id);
+            })
+            ->paginate(10)
+            ->withQueryString();
 
-        if ($request->has('buscar')) {
-            $buscar = $request->input('buscar');
-            $query->whereRaw("nombre_completo LIKE '%" . $buscar . "%'");
-        }
-
-        if ($request->has('sede_id')) {
-            $alumnos = $alumnos->where('sede_id', $request->input('sede_id'));
-        }
-
-        $sedes = Sede::all();
+        $sedes = Sede::validas()->get();
 
         return view('alumnos.index', compact('alumnos', 'sedes'));
     }
 
     public function create()
     {
-        $sedes = Sede::all();
-        return view('alumnos.create', compact('sedes'));
+        $sedes = Sede::validas()->get();
+        $programas = Programa::validos()->get();
+
+        return view('alumnos.create', compact('sedes', 'programas'));
     }
 
-    public function store(Request $request)
+    public function store(Request $request, RegistrarAlumnoService $service)
     {
         $request->validate([
             'nombre_completo' => 'required',
-            'matricula' => 'required',
-            'sede_id' => 'required',
+            'sede_id' => 'required|exists:sedes,id',
         ]);
 
-        $alumno = Alumno::create($request->only([
-            'matricula', 'nombre_completo', 'apat', 'amat',
-            'curp', 'email', 'telefono', 'sede_id', 'fecha_nacimiento'
-        ]));
+    
+        try {
+            $service->ejecutar($request->all());
 
-        if ($request->has('programa_id')) {
-            Inscripcion::create([
-                'alumno_id' => $alumno->id,
-                'programa_id' => $request->input('programa_id'),
-                'sede_id' => $request->input('sede_id'),
-                'estado' => 'activo',
-                'fecha_inscripcion' => now(),
-            ]);
+            return redirect()
+                ->route('alumnos.index')
+                ->with('success', 'Alumno creado correctamente');
+
+        } catch (\Exception $e) {
+
+            return back()
+                ->with('error', $e->getMessage())
+                ->withInput();
         }
-
-        if ($request->has('monto_inicial')) {
-            Pago::create([
-                'matricula' => $alumno->matricula,
-                'concepto' => 'Inscripción',
-                'monto' => $request->input('monto_inicial'),
-                'fecha_pago' => now(),
-                'sede_id' => $request->input('sede_id'),
-                'estado' => 'activo',
-            ]);
-        }
-
-        return redirect('/alumnos')->with('success', 'Alumno creado');
     }
 
-    public function destroy($id)
-    {
-        $alumno = Alumno::find($id);
-        $alumno->delete();
+public function destroy($id)
+{
+    $alumno = Alumno::find($id);
 
-        return redirect('/alumnos');
+    if (!$alumno) {
+        return redirect()
+            ->route('alumnos.index')
+            ->with('error', 'Alumno no encontrado');
+    }
+
+    if ($alumno->adeudos()->exists()) {
+        return redirect()
+            ->route('alumnos.index')
+            ->with('error', 'No se puede eliminar: tiene adeudos pendientes');
+    }
+
+    if ($alumno->inscripciones()->where('estado', 'activo')->exists()) {
+        return redirect()
+            ->route('alumnos.index')
+            ->with('error', 'No se puede eliminar: tiene inscripciones activas');
+    }
+
+    $alumno->delete();
+
+    return redirect()
+        ->route('alumnos.index')
+        ->with('success', 'Alumno eliminado correctamente');
+}
+    public function audit()
+    {
+        abort_unless(auth()->user()->nivel_id === 1, 403);
+
+        Artisan::call('audit:inconsistencias');
+
+        return back()->with('success', 'Auditoría ejecutada correctamente');
+    }
+
+    public function fix()
+    {
+        abort_unless(auth()->user()->nivel_id === 1, 403);
+
+        Artisan::call('fix:inconsistencias');
+
+        return back()->with('success', 'Limpieza ejecutada correctamente');
     }
 }

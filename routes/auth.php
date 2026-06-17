@@ -5,7 +5,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 Route::post('/login', function (Request $request) {
-    $credentials = $request->only('email', 'password');
+
+    $credentials = $request->validate([
+        'email' => 'required|email',
+        'password' => 'required'
+    ]);
 
     if (Auth::attempt($credentials)) {
         $request->session()->regenerate();
@@ -13,9 +17,12 @@ Route::post('/login', function (Request $request) {
     }
 
     return back()->withErrors([
-        'email' => 'Las credenciales no coinciden.',
+        'email' => 'Credenciales incorrectas',
     ]);
-});
+
+})->middleware('throttle:5,1');
+
+
 
 Route::post('/logout', function (Request $request) {
     Auth::logout();

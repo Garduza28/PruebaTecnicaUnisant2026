@@ -8,27 +8,45 @@ use Illuminate\Http\Request;
 
 class ProgramaController extends Controller
 {
-    public function index()
-    {
-        $programas = Programa::with('materias')->get();
+public function index(Request $request)
+{
+    $query = Programa::query();
 
-        foreach ($programas as $programa) {
-            $programa->total_materias = $programa->materias->count();
-        }
 
-        return view('programas.index', compact('programas'));
+    if ($request->filled('buscar')) {
+        $query->where('nombre', 'like', '%' . $request->buscar . '%');
     }
+
+    $programas = $query->withCount('materias')
+        ->orderBy('id', 'desc')
+        ->paginate(10)
+        ->appends($request->all());
+
+    return view('programas.index', compact('programas'));
+}
 
     public function store(Request $request)
     {
-        $programa = Programa::create($request->all());
+        $data = $request->validate([
+            'nombre' => 'required|string|max:255',
+            'inscripcion' => 'required|numeric|min:0',
+            'precio_materia' => 'required|numeric|min:0',
+            'materias' => 'array'
+        ]);
 
-        if ($request->has('materias')) {
-            foreach ($request->input('materias') as $materiaId) {
-                $programa->materias()->attach($materiaId);
-            }
+        $programa = Programa::create([
+            'nombre' => $data['nombre'],
+            'inscripcion' => $data['inscripcion'],
+            'precio_materia' => $data['precio_materia'],
+        ]);
+
+        if (!empty($data['materias'])) {
+            $programa->materias()->sync($data['materias']);
         }
 
-        return redirect('/programas');
+        return redirect('/programas')
+            ->with('success', 'Programa creado correctamente');
     }
+
+    
 }
