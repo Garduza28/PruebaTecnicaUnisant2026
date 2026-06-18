@@ -75,12 +75,16 @@
 
                     <ul class="list-group list-group-flush mt-2">
                         @foreach($programasTop as $programa)
-                            <li class="list-group-item d-flex justify-content-between align-items-center px-0 bg-transparent">
-                                <span class="text-dark">{{ $programa->nombre }}</span>
-                                <span class="badge bg-dark rounded-pill">
-                                    {{ $programa->inscripciones->count() }}
-                                </span>
-                            </li>
+                        <li
+                            class="list-group-item d-flex justify-content-between align-items-center px-0 bg-transparent">
+                            <span class="text-dark">
+                                {{ filled(trim($programa->nombre ?? '')) ? trim($programa->nombre) : 'Programa sin
+                                nombre' }}
+                            </span>
+                            <span class="badge bg-dark rounded-pill">
+                                {{ $programa->inscripciones->count() }}
+                            </span>
+                        </li>
                         @endforeach
                     </ul>
 

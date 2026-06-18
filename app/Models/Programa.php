@@ -27,7 +27,7 @@ public function scopeValidos($query)
 {
     return $query
         ->whereNotNull('nombre')
-        ->where('nombre', '!=', '');
+        ->whereRaw("TRIM(nombre) <> ''")
+        ->where('precio_materia', '>', 0);
 }
-
 }

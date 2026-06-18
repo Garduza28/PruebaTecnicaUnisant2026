@@ -115,14 +115,14 @@
     <nav>
         <ul class="pagination pagination-sm align-items-center gap-1 mb-0">
 
-        
+
             <li class="page-item {{ $alumnos->onFirstPage() ? 'disabled' : '' }}">
                 <a class="page-link" href="{{ $alumnos->previousPageUrl() }}">
                     ‹
                 </a>
             </li>
 
-          
+
             @foreach ($alumnos->getUrlRange(1, $alumnos->lastPage()) as $page => $url)
             <li class="page-item {{ $page == $alumnos->currentPage() ? 'active' : '' }}">
                 <a class="page-link" href="{{ $url }}">
@@ -131,7 +131,7 @@
             </li>
             @endforeach
 
-         
+
             <li class="page-item {{ $alumnos->hasMorePages() ? '' : 'disabled' }}">
                 <a class="page-link" href="{{ $alumnos->nextPageUrl() }}">
                     ›
@@ -186,16 +186,68 @@
         </div>
     </div>
 </div>
+
+
+<div class="modal fade" id="fixModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    Confirmar corrección
+                </h5>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <div class="modal-body">
+
+                <p>
+                    Esta acción ejecutará la corrección automática de inconsistencias detectadas en el sistema.
+                </p>
+
+                <div class="alert alert-warning mb-0">
+                    Asegúrate de haber revisado los datos antes de continuar.
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+
+                <form method="POST" action="{{ route('alumnos.fix') }}">
+                    @csrf
+
+                    <button type="submit" class="btn btn-danger">
+                        Sí, corregir
+                    </button>
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+</div>
 @if(in_array(auth()->user()?->nivel_id, [1]))
 
-<div class="mb-3 d-flex gap-2">
+<div class="mb-3">
 
-    <form method="POST" action="{{ route('alumnos.fix') }}">
-        @csrf
-        <button class="btn btn-danger btn-sm">
-            Corregir inconsistencias
-        </button>
-    </form>
+    <button
+        class="btn btn-danger btn-sm"
+        data-bs-toggle="modal"
+        data-bs-target="#fixModal">
+        Corregir inconsistencias
+    </button>
+
+    <br> <br> 
+
+      <small class="text-muted d-block mb-1">
+        Visible únicamente para administradores.
+    </small>
 
 </div>
 
@@ -251,6 +303,8 @@ document.getElementById('deleteForm').action = `/alumnos/${id}`;
 
 });
 </script>
+
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 

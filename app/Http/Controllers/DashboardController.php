@@ -26,10 +26,11 @@ class DashboardController extends Controller
 
         $promedioPago = Pago::avg('monto') ?? 0;
 
-        $programasTop = Programa::withCount('inscripciones')
-            ->orderByDesc('inscripciones_count')
-            ->take(5)
-            ->get();
+        $programasTop = Programa::validos()
+           ->withCount('inscripciones')
+           ->orderByDesc('inscripciones_count')
+           ->take(5)
+           ->get();
 
         return view('dashboard.index', compact(
             'alumnosActivos',
