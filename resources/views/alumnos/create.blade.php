@@ -25,7 +25,7 @@
 
         <div class="row g-4">
 
-        
+
             <div class="col-lg-6">
                 <div class="card border-0 shadow-sm">
                     <div class="card-body">
@@ -60,7 +60,7 @@
                         <h6 class="text-uppercase text-muted mb-3">Contacto</h6>
 
                         <label class="form-label small fw-semibold">Correo electrónico</label>
-                        <input class="form-control mb-3" name="email">
+                        <input type="email" class="form-control mb-3" name="email" required maxlength="255">
 
                         <label class="form-label small fw-semibold">Teléfono</label>
                         <input class="form-control mb-3" name="telefono" maxlength="15"
@@ -70,7 +70,7 @@
                 </div>
             </div>
 
-      
+
             <div class="col-lg-6">
                 <div class="card border-0 shadow-sm">
                     <div class="card-body">
@@ -100,7 +100,7 @@
                 </div>
             </div>
 
-    
+
             <div class="col-lg-6">
                 <div class="card border-0 shadow-sm">
                     <div class="card-body">
@@ -108,10 +108,19 @@
                         <h6 class="text-uppercase text-muted mb-3">Finanzas</h6>
 
                         <label class="form-label small fw-semibold">Monto inicial</label>
-                        <input class="form-control" name="monto_inicial" type="number" min="1" max="99999.99"
-                            step="0.01" oninput="if(this.value.length > 7) this.value = this.value.slice(0,7)" required>
 
-                        <small class="text-muted">Máximo: 99,999.99</small>
+                        <input class="form-control" name="monto_inicial" type="number" min="1" max="99999999.99"
+                            step="0.01" required oninput="
+                    let partes = this.value.split('.');
+                    if (partes[0].length > 8) {
+                        partes[0] = partes[0].slice(0,8);
+                        this.value = partes.join('.');
+                    }
+                ">
+
+                        <small class="text-muted">
+                            Máximo: 99,999,999.99
+                        </small>
 
                     </div>
                 </div>
@@ -119,7 +128,7 @@
 
         </div>
 
-  
+
         <div class="d-flex justify-content-end gap-2 mt-4">
 
             <a href="{{ route('alumnos.index') }}" class="btn btn-outline-secondary">
@@ -164,26 +173,30 @@
 });
 </script>
 
-{{-- SUCCESS --}}
+@push('scripts')
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 @if(session('success'))
 <script>
     Swal.fire({
     icon: 'success',
     title: '¡Éxito!',
-    text: "{{ session('success') }}",
+    text: @json(session('success')),
     timer: 2500,
     showConfirmButton: false
 });
 </script>
 @endif
 
-{{-- ERROR --}}
 @if(session('error'))
 <script>
     Swal.fire({
     icon: 'error',
     title: 'Error',
-    text: "{{ session('error') }}"
+    text: @json(session('error'))
 });
 </script>
 @endif
+
+@endpush
