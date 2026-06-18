@@ -44,7 +44,7 @@ public function store(Request $request)
 {
     $request->validate([
         'matricula' => 'required|exists:alumnos,matricula',
-        'monto' => 'required|numeric|min:1|max:99999.99',
+        'monto' => 'required|numeric|min:1|max:99999999.99',
         'fecha_pago' => 'required|date|before_or_equal:today',
         'metodo' => 'required|string',
         'sede_id' => 'required|exists:sedes,id',

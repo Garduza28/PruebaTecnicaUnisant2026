@@ -46,16 +46,32 @@
             </div>
 
 
-            <div class="mb-2">
-                <label class="form-label small fw-semibold">Monto</label>
+<div class="mb-2">
+    <label class="form-label small fw-semibold">Monto</label>
 
-                <input type="number" step="0.01" min="0.01" max="9999999.99" name="monto" id="monto"
-                    class="form-control form-control-sm" required>
+    <input
+        type="number"
+        step="0.01"
+        min="0.01"
+        max="99999999.99"
+        name="monto"
+        id="monto"
+        class="form-control form-control-sm"
+        required
+        oninput="
+            let partes = this.value.split('.');
+            if (partes[0].length > 8) {
+                partes[0] = partes[0].slice(0,8);
+                this.value = partes.join('.');
+            }
+        ">
 
-                <small class="text-muted">Debe ser mayor a 0</small>
-                <small class="text-danger" id="err-monto"></small>
-            </div>
+    <small class="text-muted">
+        Máximo: 99,999,999.99
+    </small>
 
+    <small class="text-danger" id="err-monto"></small>
+</div>
 
             <div class="mb-2">
                 <label class="form-label small fw-semibold">Fecha de pago</label>
